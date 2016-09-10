@@ -25,7 +25,7 @@
                     <div class="form-group">
                         <div class="fg-line">
                             <div class="select">
-                                <select class="form-control" id="parrents">
+                                <select class="form-control" id="parrents" name="cboParrent">
                                     <option value="0">Select an Option</option>
                                     @foreach($datas['pid'] as $parrent)
                                     <option  value="{{$parrent->id}}">
@@ -43,7 +43,7 @@
                     <div class="form-group">
                         <div class="fg-line">
                             <div class="select">
-                                <select class="form-control" id="child">  
+                                <select class="form-control" id="child" name="cboChild">  
                                 </select>
                             </div>
                         </div>
@@ -66,9 +66,9 @@ $(document).ready(function(){
       success: function(data){
         if(data.length > 0){
             $("#hchild").show();
-            $( "#child" ).append( "<option>Select child</option>" );
+            $( "#child" ).append( "<option value='0'>Select child</option>" );
             $.each(data, function( index, value ) { 
-               $( "#child" ).append( "<option>"+value.name+"</option>" );
+               $( "#child" ).append( "<option value="+value.id+">"+value.name+"</option>" );
             });
         }else{
             $("#hchild").hide();

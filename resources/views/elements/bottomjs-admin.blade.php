@@ -30,6 +30,7 @@
 <script src="{{asset('js/functions.js')}}"></script>
 <script src="{{asset('js/demo.js')}}"></script>
 <script type="text/javascript">   
+    //Function deleted,edite category
     $(function() { 
         //Command Buttons
         $("#data-table-command").bootgrid({
@@ -42,18 +43,20 @@
             },
             formatters: {
                 "commands": function(column, row) {  
-                    var routeedit='';
-                    var routedelete='';
-                    if( route.catedit=='catedit'){
-                        routeedit=route.catedit;
-                    }if(route.proedit=='proedit'){
-                        routeedit=route.proedit;
-                    }if(route.catdelete=='catdelete'){
-                        routedelete=route.catdelete;
-                    }if(route.prodelete=='prodelete'){
-                        routedelete=route.prodelete;
-                    }
-                    return "<a href="+routeedit+'/'+row.id+"><button type=\"button\" class=\"btn btn-icon command-edit waves-effect waves-circle\" data-row-id=\"" + row.id + "\"><span class=\"zmdi zmdi-edit\"></span></button> </a>" + "<a href='"+routedelete+'/'+row.id+"'><button type=\"button\"  id=\"sa-warning\" class=\"btn btn-icon command-delete waves-effect waves-circle\" data-row-id=\"" + row.id + "\"><span class=\"zmdi zmdi-delete\"></span></button></a>"; }
+                    console.log(row.child);
+                    // var routeedit='';
+                    // var routedelete='';
+                    // if( route.catedit=='catedit'){
+                    //     routeedit=route.catedit;
+                    // }if(route.proedit=='proedit'){
+                    //     routeedit=route.proedit;
+                    // }if(route.catdelete=='catdelete'){
+                    //     routedelete=route.catdelete;
+                    // }if(route.prodelete=='prodelete'){
+                    //     routedelete=route.prodelete;
+                    // }
+                    //return "<a href="+routeedit+'/'+row.id+"><button type=\"button\" class=\"btn btn-icon command-edit waves-effect waves-circle\" data-row-id=\"" + row.id + "\"><span class=\"zmdi zmdi-edit\" ></span></button> </a>" + "<a href='"+routedelete+'/'+row.id+"'><button onclick='confirmdelete()' type=\"button\"  id=\"sa-warning\" class=\"btn btn-icon command-delete waves-effect waves-circle\" data-row-id=\"" + row.id + "\"><span class=\"zmdi zmdi-delete\"></span></button></a>"; }
+                    return "<a href="+route.edit+'/'+row.id+"><button  type=\"button\" class=\"btn btn-icon command-edit waves-effect waves-circle\" data-row-id=\"" + row.id + "\"><span class=\"zmdi zmdi-edit\" ></span></button></a>" + "<button onclick=\"confirmdelete('"+route.delete+"/"+row.id+"')\" type=\"button\"  id=\"sa-warning\" class=\"btn btn-icon command-delete waves-effect waves-circle\" data-row-id=\"" + row.id + "\"><span class=\"zmdi zmdi-delete\"></span></button>"; }
             }
         });
     });  
@@ -136,8 +139,7 @@ $('#sa-success').click(function(){
     swal("Good job!", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed lorem erat, tincidunt vitae ipsum et, pellentesque maximus enim. Mauris eleifend ex semper, lobortis purus sed, pharetra felis", "success")
 });
 
-//Warning Message
-$('.zmdi-delete').click(function(){
+function confirmdelete(id){
     swal({   
         url:"go",
         title: "Are you sure?",   
@@ -147,8 +149,28 @@ $('.zmdi-delete').click(function(){
         confirmButtonColor: "#DD6B55",   
         confirmButtonText: "Yes, delete it!",   
         closeOnConfirm: false 
-    }, function(){   
+    }, function(){
+       $.ajax({
+        url: id,
+        success: function(result){
+            console.log('success');
+        }});
         swal("Deleted!", "Your imaginary file has been deleted.", "success"); 
+    });
+}
+//Warning Message
+$('.zmdi-delete').click(function(){
+    swal({   
+        url:"go",
+        title: "Are you sure?",   
+        text: "You will not be able to recover your data!",   
+        type: "warning",   
+        showCancelButton: true,   
+        confirmButtonColor: "#DD6B55",   
+        confirmButtonText: "Yes, delete it!",   
+        closeOnConfirm: false 
+    }, function(){   
+        swal("Deleted!", "Your data has been deleted.", "success"); 
     });
 });
 

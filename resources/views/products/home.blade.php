@@ -20,6 +20,7 @@
                 <th data-column-id="color" data-order="desc">color</th>
                 <th data-column-id="made" data-order="desc">made</th>
                 <th data-column-id="type" data-order="desc">type</th>
+                <th data-column-id="ptype" data-order="desc">p-type</th>
                 <th data-column-id="brand" data-order="desc">brand</th>
                 <th data-column-id="created" data-order="desc">created</th>
                 <th data-column-id="commands" data-formatter="commands" data-sortable="false">Actions</th>
@@ -28,7 +29,19 @@
         <tbody>  
             @foreach($data['products'] as $result) 
                 <?php
-                    $img="<img src='".$result->image."'>";
+                   // $img="<img src='".$result->image."'>";
+                    $explgid=explode(',', $result->gid);
+                    if(count($explgid) > 0){
+                        foreach($explgid as $gid){
+                            foreach ($data['categories']['galleries'] as $value) {
+                               if($gid==$value->id){
+                                    $img="<img src='".str_replace('\\','/',$value->name)."'>";
+                               }
+                            }
+                        }
+                    }else{
+                        $img='';
+                    }
                 ?>
                 <tr>
                     <td>{{$result->id}}</td> 
@@ -49,9 +62,16 @@
                              {{$type->name}}
                             @endif
                         @endforeach
-                    </td> 
+                    </td>
                     <td>
-                        @foreach($data['categories']['brand'] as $brand)
+                        @foreach($data['categories']['all'] as $ptype)
+                            @if($ptype->id==$result->ptype)
+                             {{$ptype->name}}
+                            @endif
+                        @endforeach
+                    </td>
+                    <td>
+                        @foreach($data['categories']['all'] as $brand)
                             @if($brand->id==$result->brand)
                              {{$brand->name}}
                             @endif
@@ -67,6 +87,6 @@
 </div> 
 <script type="text/javascript">
     var route={};
-        route['proedit']='<?php echo "proedit";?>'; 
-        route['prodelete']='<?php echo "prodelete";?>'; 
+        route['edit']='<?php echo "proedit";?>'; 
+        route['delete']='<?php echo "prodelete";?>'; 
 </script>

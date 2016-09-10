@@ -1,3 +1,8 @@
+<style>
+    .hbrand,.hproduct{
+        display: none;
+    }
+</style>
 <div class="card">
     <div class="card-header">
         <h2>New Product<small>Please input all field have required before submit.</small></h2>
@@ -51,22 +56,35 @@
                 </div> 
                 <div class="col-sm-4 m-b-25"> 
                    <p class="f-500 m-b-15 c-black">Type</p> 
-                    <select class="selectpicker" data-live-search="true" name="cboType">
+                    <select class="selectpicker" data-live-search="true" name="cboType" id="cboType">
                         <option></option>
                         @foreach($data['categories']['type'] as $result)
                         <option value="{{$result->id}}">{{$result->name}}</option>
                         @endforeach
                     </select>
+                </div> 
+                <div class="col-sm-4 m-b-25 hproduct">  
+                    <p class="f-500 m-b-15 c-black">Type of product</p> 
+                    <div class="form-group">
+                        <div class="fg-line">
+                            <div class="select">
+                                <select class="form-control" id="cboPrduct" name="cboPrduct"> 
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-4 m-b-25"> 
+                <div class="col-sm-4 m-b-25 hbrand">  
                     <p class="f-500 m-b-15 c-black">Brand</p> 
-                    <select class="selectpicker" data-live-search="true" name="cboBrand">
-                        <option></option>
-                        @foreach($data['categories']['brand'] as $result)
-                        <option value="{{$result->id}}">{{$result->name}}</option>
-                        @endforeach 
-                    </select> 
-                </div>
+                    <div class="form-group">
+                        <div class="fg-line">
+                            <div class="select">
+                                <select class="form-control" id="cboBrand" name="cboBrand"> 
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
                 <div class="col-sm-4 m-b-25">  
                     <p class="f-500 m-b-15 c-black">Made</p> 
                     <select class="selectpicker" data-live-search="true" name="cboMade">
@@ -88,20 +106,62 @@
                         @endforeach
                     </div>
                 </div> 
-                <div class="col-xs-12">
-                    <p class="f-500 c-black m-b-20">Image Preview</p> 
+                <div class="col-xs-3">
+                    <p class="f-500 c-black m-b-20">Image Preview 1</p> 
                     <div class="fileinput fileinput-new" data-provides="fileinput">
                         <div class="fileinput-preview thumbnail" data-trigger="fileinput" ></div>
                         <div>
                             <span class="btn btn-info btn-file">
-                                <span class="fileinput-new">Select image</span>
+                                <span class="fileinput-new">Select image 1</span>
                                 <span class="fileinput-exists">Change</span>
-                                <input type="file" name="proImage">
+                                <input type="file" name="proImage[]">
                             </span>
                             <a href="#" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">Remove</a>
                         </div>
                     </div>  
                 </div>
+                <div class="col-xs-3">
+                    <p class="f-500 c-black m-b-20">Image Preview 2</p> 
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <div class="fileinput-preview thumbnail" data-trigger="fileinput" ></div>
+                        <div>
+                            <span class="btn btn-info btn-file">
+                                <span class="fileinput-new">Select image 2</span>
+                                <span class="fileinput-exists">Change</span>
+                                <input type="file" name="proImage[]">
+                            </span>
+                            <a href="#" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">Remove</a>
+                        </div>
+                    </div>  
+                </div>
+                <div class="col-xs-3">
+                    <p class="f-500 c-black m-b-20">Image Preview 3</p> 
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <div class="fileinput-preview thumbnail" data-trigger="fileinput" ></div>
+                        <div>
+                            <span class="btn btn-info btn-file">
+                                <span class="fileinput-new">Select image 3</span>
+                                <span class="fileinput-exists">Change</span>
+                                <input type="file" name="proImage[]">
+                            </span>
+                            <a href="#" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">Remove</a>
+                        </div>
+                    </div>  
+                </div>
+                <div class="col-xs-3">
+                    <p class="f-500 c-black m-b-20">Image Preview 4</p> 
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <div class="fileinput-preview thumbnail" data-trigger="fileinput" ></div>
+                        <div>
+                            <span class="btn btn-info btn-file">
+                                <span class="fileinput-new">Select image 4</span>
+                                <span class="fileinput-exists">Change</span>
+                                <input type="file" name="proImage[]">
+                            </span>
+                            <a href="#" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">Remove</a>
+                        </div>
+                    </div>  
+                </div> 
             </div> 
             <p class="f-500 c-black m-b-20">Description</p>
             <div class="html-editor"></div>
@@ -109,3 +169,49 @@
         </form>
     </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function(){
+      $(document).on("change", "#cboType", function(){
+        $( "#cboPrduct" ).empty();
+        $.ajax({
+          url: 'getChild',
+          type: "post",
+          dataType: "json",
+          data: {'pid':$(this).val(),'_token': $('input[name=_token]').val()},
+          success: function(data){
+            console.log(data);
+            if(data.length > 0){
+                $(".hproduct").show();
+                $( "#cboPrduct" ).append( "<option value='0'>Select product</option>" );
+                $.each(data, function( index, value ) { 
+                   $( "#cboPrduct" ).append( "<option value="+value.id+">"+value.name+"</option>" );
+                });
+            }else{
+                $(".hproduct").hide();
+            }
+          }
+        });      
+      });
+      $(document).on("change", "#cboPrduct", function(){
+        $( "#cboBrand" ).empty();
+        $.ajax({
+          url: 'getChild',
+          type: "post",
+          dataType: "json",
+          data: {'pid':$(this).val(),'_token': $('input[name=_token]').val()},
+          success: function(data){
+            console.log(data);
+            if(data.length > 0){
+                $(".hbrand").show();
+                $( "#cboBrand" ).append( "<option value='0'>Select brand</option>" );
+                $.each(data, function( index, value ) { 
+                   $( "#cboBrand" ).append( "<option value="+value.id+">"+value.name+"</option>" );
+                });
+            }else{
+                $(".hbrand").hide();
+            }
+          }
+        });      
+      }); 
+    });
+</script>

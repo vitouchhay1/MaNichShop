@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Product;
 use App\Category;
+use App\Gallery;
 use DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
@@ -20,12 +21,23 @@ class ProductController extends Controller {
 		return $cats;
 	} 
 	public function getCategories(){
-		$data['country']=$this->getCategoryById(1); 
+		$data['country']=$this->getCategoryById(20); 
 		$data['brand']=$this->getCategoryById(42); 
-		$data['size']=$this->getCategoryById(3); 
-		$data['type']=$this->getCategoryById(2); 
+		$data['size']=$this->getCategoryById(14); 
+		$data['type']=$this->getCategoryById(0); 
 		$data['cat']=$this->getCategoryById(39); 
+		$data['all']=DB::SELECT("SELECT * FROM categories where pid >0 ");
+		$data['galleries']=DB::table('galleries')->get();
 		return $data;
+	}
+	// get child
+	public function getChild(Request $Request){
+		// Getting all post data
+		$data=array();
+		if($Request->get('pid') > 0){
+			$data=DB::SELECT("SELECT * FROM categories where pid=".$Request->get('pid')."");
+		}
+		echo json_encode($data);
 	}
 	/**
 	 * Display a listing of the resource.
@@ -64,24 +76,43 @@ class ProductController extends Controller {
 			$expl=implode(",",$Request->get('cbsize'));  	
 		}else{
 			$expl="";	
-		} 
-
-		//upload image 
+		}  
+		//upload multi image 
 		$files = $Request->file('proImage');  
-        $id = Str::random(14); 
-        $destinationPath ='webs/products/'. $id;  
-        $filename = $files->getClientOriginalName();  
-        $extension = $files->getClientOriginalExtension();
-        $upload_success = $files->move($destinationPath, $filename);   
+		if( count($files) > 0){
+			$upload_success=array();
+			foreach($files as $file){
+				$id = Str::random(14); 
+		        $destinationPath ='webs/products/'. $id;  
+		        $filename = $file->getClientOriginalName();  
+		        $extension = $file->getClientOriginalExtension();
+		        $upload_success[]= $file->move($destinationPath, $filename);
+			}
+		}else{
+			$upload_success='';
+		}
+		$lastid=array();
+		if ($upload_success!=''){
+			foreach($upload_success as $path){
+				#push image id to array | insert with get last_id
+				$lastid[]= DB::table('galleries')->insertGetId(['name'=>$path,'created_at'=>date("Y-m-d H:m:s")]);
+				#insert only
+				// Gallery::insert(array('name'=>$path, 'created_at'=>date("Y-m-d H:m:s") )); 
+			}
+			$idimg=implode(',', $lastid);
+		}else{
+			$idimg='';
+		}
 		Product::insert(array('name'=>$Request->get('txtName'),
 			'price'=>$Request->get('txtPrice'),
 			'color'=>$Request->get('txtColor'),
 			'brand'=>$Request->get('cboBrand'),
 			'made'=>$Request->get('cboMade'),
 			'type'=>$Request->get('cboType'),
+			'ptype'=>$Request->get('cboPrduct'),
 			'category'=>$Request->get('cboCategory'),
 			'size'=>$expl,
-			'image'=>$upload_success,
+			'image'=>$idimg,
 			'created_at'=>date("Y-m-d H:m:s"),
 			//'description'=>$Request->get('txaDecription')
 		));
@@ -134,7 +165,14 @@ class ProductController extends Controller {
 		/*explode id pro check box*/
 		$expl=implode(",",$Request->get('cbsize'));
 		//upload image 
-		$files = $Request->file('proImage');  
+		$files = $Request->file('proImage'); 
+		$imgid = $Request->get('gid');
+		// remove empty array
+		$files = array_filter( $files );
+		$imgids = array_filter( $imgid ); 
+		// print_r($files);
+		// print_r($imgids);
+		// exit(); 
 		$product->name=$Request->get('txtName');
 		$product->price=$Request->get('txtPrice');
 		$product->color=$Request->get('txtColor');
@@ -143,14 +181,24 @@ class ProductController extends Controller {
 		$product->type=$Request->get('cboType');
 		$product->category=$Request->get('cboCategory');
 		$product->size=$expl;
-		if($files!=''){
-			$id = Str::random(14); 
-	        $destinationPath ='webs/products/'. $id;  
-	        $filename = $files->getClientOriginalName();  
-	        $extension = $files->getClientOriginalExtension();
-	        $upload_success = $files->move($destinationPath, $filename); 
-			$product->image=$upload_success;
-		} 
+		if(count($files) > 0){
+			foreach($files as $key => $file){
+				if($file!=''){
+					// Select to delete image
+					$data=DB::SELECT("SELECT name FROM galleries where id=".$imgids[$key]."");
+					$del = asset($data[0]->name);
+					// Delete single file
+					File::delete($del);
+					$gallery=Gallery::find($imgids[$key]);
+			        $destinationPath ='webs/products/'. $id;  
+			        $filename = $file->getClientOriginalName();  
+			        $extension = $file->getClientOriginalExtension();
+			        $upload_success = $file->move($destinationPath, $filename); 
+					$gallery->name=$upload_success;
+					$gallery->save();
+				}
+			}
+		}
 		//$product->description=$Request->get('txaDecription');
 		$product->updated_at=date("Y-m-d H:m:s");
 		$product->save();

@@ -27,8 +27,8 @@
         <a href=""><i class="zmdi zmdi-view-list"></i> Tables</a>
 
         <ul>
-            <li><a href="{{URL::to('product')}}">Normal Tables</a></li>
-            <li><a href="{{URL::to('category')}}">Data Tables</a></li>
+            <li><a href="{{URL::to('product')}}">Products</a></li>
+            <li><a href="{{URL::to('category')}}">Categories</a></li>
         </ul>
     </li>
     <li class="sub-menu">
